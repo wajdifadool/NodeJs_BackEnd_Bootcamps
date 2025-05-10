@@ -1,7 +1,9 @@
 const colors = require('colors')
 const express = require('express')
 const dotenv = require('dotenv')
+const middlewareLooger = require('./middleware/logger')
 
+const morgan = require('morgan')
 //Route file
 const bootcamps = require('./routes/bootcamps')
 
@@ -13,17 +15,26 @@ dotenv.config({
 // init the app variable
 const app = express()
 
-// all miidleware functions have (req , res , next)
-const looger = (req, res, next) => {
-  // it have acces to to req
-  // we set value on the req object then we can access in any route that come after this midlleware
+// Dev loging middleware
+// runs onky on dev mode
 
-  req.hello = 'hello looger' // we can access .hello in any route becuse we have app.use(looger) meaning the app insert the looger in the cycle
-  console.log('middleware ran')
-  // we call next so ot moves to the next piece of middlware in the cycle
-  next()
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'))
 }
-app.use(looger)
+// // all miidleware functions have (req , res , next)
+// const looger = (req, res, next) => {
+//   // it have acces to to req
+//   // we set value on the req object then we can access in any route that come after this midlleware
+
+//   req.hello = 'hello looger' // we can access .hello in any route becuse we have app.use(looger) meaning the app insert the looger in the cycle
+//   console.log('middleware ran')
+//   // we call next so ot moves to the next piece of middlware in the cycle
+//   next()
+// }
+
+// all miidleware functions have (req , res , next)
+
+// app.use(middlewareLooger)
 // mount routers
 app.use('/api/v1/bootcamps', bootcamps)
 

@@ -5,7 +5,10 @@
 // @acsess  Public
 exports.getBootcamps = (req, res, next) => {
   res
-    .json({ succsess: true, message: `all bootcamps goes here ${req.hello}` })
+    .json({
+      succsess: true,
+      message: `all bootcamps goes here ${req.hello}`,
+    })
     .status(200)
 }
 
