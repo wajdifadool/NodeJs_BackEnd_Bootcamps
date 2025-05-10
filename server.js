@@ -1,16 +1,21 @@
-const colors = require('colors')
 const express = require('express')
 const dotenv = require('dotenv')
+const connectDB = require('./config/db')
+// dev deps
+const morgan = require('morgan')
+const colors = require('colors')
 const middlewareLooger = require('./middleware/logger')
 
-const morgan = require('morgan')
-//Route file
+// Route file
 const bootcamps = require('./routes/bootcamps')
 
 // Load ENV VARS
 dotenv.config({
   path: './config/config.env',
 })
+
+// connect to the data base
+connectDB()
 
 // init the app variable
 const app = express()
@@ -43,11 +48,19 @@ app.use('/api/v1/bootcamps', bootcamps)
 app.get('/', (req, res) => {
   res.json({ succsess: true, message: 'Server Running al good' }).status(200)
 })
+
 const PORT = process.env.PORT || 5000
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   // Call back
   const text =
     `listneng to port ${PORT}\nlistneng in mode ${process.env.NODE_ENV}`.bgWhite
       .green
   console.log(text)
+})
+
+// handle unhandled promise rejection connection
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error ${err.message}`.bgRed)
+  // close server and exit the processs
+  server.close(() => process.exit(1))
 })
