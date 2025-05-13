@@ -20,9 +20,12 @@ connectDB()
 // init the app variable
 const app = express()
 
+// Body parser in order to read request body from the  req
+// its basicly piesc of middleware
+app.use(express.json())
+
 // Dev loging middleware
 // runs onky on dev mode
-
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const slugify = require('slugify')
+// const slugify = require('slugify')
 
 // const axios = require('axios')
 const BootcampSchema = new mongoose.Schema(
@@ -44,12 +44,12 @@ const BootcampSchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ['Point'],
-        required: true,
+        // required: true,
       },
       coordinates: {
         type: [Number],
         index: '2dsphere',
-        required: true,
+        // required: true,
       },
       formattedAddress: String,
       street: String,
