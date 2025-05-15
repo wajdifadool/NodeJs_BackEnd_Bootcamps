@@ -5,6 +5,7 @@ const connectDB = require('./config/db')
 const morgan = require('morgan')
 const colors = require('colors')
 const middlewareLooger = require('./middleware/logger')
+const errorHandler = require('./middleware/errorHandler')
 
 // Route file
 const bootcamps = require('./routes/bootcamps')
@@ -45,6 +46,7 @@ if (process.env.NODE_ENV === 'development') {
 // app.use(middlewareLooger)
 // mount routers
 app.use('/api/v1/bootcamps', bootcamps)
+app.use(errorHandler)
 
 // to run the server we have to listen to ( http module )
 // BASIC TESTING
