@@ -3,6 +3,8 @@ const ErrorResponse = require('../utils/errorResponse')
 const errorHandler = (err, req, res, next) => {
   let message = ''
   console.log('-------------------------------------')
+  console.log(err.message)
+  console.log('-------------------------------------')
 
   let error = { ...err }
   // Mongosee Bad Object ID :

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { default: slugify } = require('slugify')
 // const slugify = require('slugify')
 
 // const axios = require('axios')
@@ -122,12 +123,13 @@ const BootcampSchema = new mongoose.Schema(
 //https://mongoosejs.com/docs/middleware.html#types-of-middleware
 // Create Bootcamp Slug from the name
 // will run before the documnet get saved
-// BootcampSchema.pre('save', function (next) {
-//   // we can accses any field using this.
-//   console.log('sluguify ran')
-//   this.slug = slugify(this.name, { lower: true })
-//   next() // so it can continue to the next function (creating the object)
-//})
+BootcampSchema.pre('save', function (next) {
+  // we can accses any field using this.
+  console.log('sluguify ran')
+
+  this.slug = slugify(this.name, { lower: true })
+  next() // so it can continue to the next function (creating the object)
+})
 
 //  *
 // Cascade delete courses when a bootcamp is deleted
