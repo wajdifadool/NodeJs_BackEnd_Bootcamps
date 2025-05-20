@@ -60,6 +60,38 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
   })
 })
 
+// @desc    Add single Course
+// @route   POST /api/v1/bootcamps/:bootcampId/courses
+// @acsess  Public
+exports.createCourse = asyncHandler(async (req, res, next) => {
+  // get the bootcamp id
+  console.log('course.js//createCourse() ')
+  const id = req.params.bootcampId
+  // add the id to the body manualy hence the Course schema contaions bootcampID
+  req.body.bootcamp = id
+
+  let query
+  query = Bootcamp.findById(id)
+
+  const bootcamp = await query
+
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(
+        `Bootcamp Not found with the id of ${req.params.id}`,
+        404
+      )
+    )
+  }
+  // we found the bootcamp, create the course
+  const course = await Course.create(req.body)
+
+  res.status(200).json({
+    succsess: true,
+    data: course,
+  })
+})
+
 // @desc    Update existing course
 // @route   PUT /api/v1/courses/:id
 // @acsess  Private
