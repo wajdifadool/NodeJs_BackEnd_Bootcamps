@@ -36,3 +36,75 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
     data: courses,
   })
 })
+
+// @desc    Get single Course
+// @route   Get /api/v1/courses/:id
+// @acsess  Public
+exports.getCourse = asyncHandler(async (req, res, next) => {
+  let query
+  query = Course.findById(req.params.id).populate({
+    path: 'bootcamp',
+    select: 'name description',
+  })
+
+  const course = await query
+  if (!course) {
+    return next(
+      new ErrorResponse(`Course Not found with the id of ${req.params.id}`, 404)
+    )
+  }
+
+  res.status(200).json({
+    succsess: true,
+    data: course,
+  })
+})
+
+// @desc    Update existing course
+// @route   PUT /api/v1/courses/:id
+// @acsess  Private
+exports.updateCourse = asyncHandler(async (req, res, next) => {
+  const id = req.params.id
+
+  const coursePromise = await Course.findByIdAndUpdate(
+    id,
+    { $set: req.body },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+  //   {new:true} : will return the new updated Model
+  if (!coursePromise) {
+    return next(
+      new ErrorResponse(`Course Not found with the id of ${req.params.id}`, 404)
+    )
+  }
+
+  res.status(200).json({
+    succsess: true,
+    data: coursePromise,
+    message: 'course updated successfully!',
+  })
+})
+
+// @desc    Delete existing course
+// @route   PUT /api/v1/courses/:id
+// @acsess  Private
+exports.deleteCourse = asyncHandler(async (req, res, next) => {
+  const id = req.params.id
+
+  const coursePromise = await Course.findByIdAndDelete(id)
+  //   {new:true} : will return the new updated Model
+  if (!coursePromise) {
+    return next(
+      new ErrorResponse(`Course Not found with the id of ${req.params.id}`, 404)
+    )
+  }
+
+  res.status(200).json({
+    succsess: true,
+    data: coursePromise,
+    message: 'course deleted successfully!',
+  })
+})
