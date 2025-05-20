@@ -125,7 +125,6 @@ const BootcampSchema = new mongoose.Schema(
 // will run before the documnet get saved
 BootcampSchema.pre('save', function (next) {
   // we can accses any field using this.
-  console.log('sluguify ran')
 
   this.slug = slugify(this.name, { lower: true })
   next() // so it can continue to the next function (creating the object)

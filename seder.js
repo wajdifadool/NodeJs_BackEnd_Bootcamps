@@ -8,6 +8,7 @@ dotenv.config({ path: './config/config.env' })
 
 // Load Modles
 const Bootcamp = require('./model/Bootcamp')
+const Course = require('./model/Course')
 
 const connectDB = async () => {
   const conn = await mongoose.connect(process.env.MONGO_URI)
@@ -19,9 +20,14 @@ connectDB()
 
 // connectDB()
 
-// read json file
+// read json file for bootcamps
 const bootcamps = JSON.parse(
   fs.readFileSync(`${__dirname}/_data/bootcamps.json`),
+  'utf-8'
+)
+// read json file for Courses
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`),
   'utf-8'
 )
 
@@ -29,6 +35,7 @@ const bootcamps = JSON.parse(
 const impotData = async () => {
   try {
     await Bootcamp.create(bootcamps)
+    await Course.create(courses)
     console.log('data Imported to the db ...'.green.inverse)
     process.exit()
   } catch (error) {
@@ -39,6 +46,7 @@ const impotData = async () => {
 const deleteData = async () => {
   try {
     await Bootcamp.deleteMany() // de;lete the whole data base
+    await Course.deleteMany()
     console.log('data Deleted from the db ...'.green.inverse)
     process.exit()
   } catch (error) {
