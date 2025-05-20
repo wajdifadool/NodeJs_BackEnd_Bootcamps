@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const { default: slugify } = require('slugify')
+
 // const slugify = require('slugify')
 
 // const axios = require('axios')
@@ -112,12 +113,12 @@ const BootcampSchema = new mongoose.Schema(
     //   ref: 'User',
     //   required: true,
     // },
-  }
+  },
 
-  // {
-  //   toJSON: { virtuals: true },
-  //   toObject: { virtuals: true },
-  // }
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 )
 
 //https://mongoosejs.com/docs/middleware.html#types-of-middleware
@@ -132,25 +133,26 @@ BootcampSchema.pre('save', function (next) {
 
 //  *
 // Cascade delete courses when a bootcamp is deleted
-// BootcampSchema.pre(
-//   'deleteOne',
-//   { document: true, query: false },
-//   async function (next) {
-//     console.log(`Courses being removed from bootcamp ${this._id}`)
+BootcampSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  async function (next) {
+    console.log(`Courses being removed from bootcamp ${this._id}`)
 
-//     // Now we can safely use this._id because this refers to the document
-//     await this.model('Course').deleteMany({ bootcamp: this._id })
+    // Now we can safely use this._id because this refers to the document
+    await this.model('Course').deleteMany({ bootcamp: this._id })
 
-//     next()
-//   }
-// )
+    next()
+  }
+)
 
 // Reverse paupulate  with virtauls
-// BootcampSchema.virtual('courses', {
-//   ref: 'Course',
-//   localField: '_id',
-//   foreignField: 'bootcamp',
-//   justOne: false,
-// })
+// https://mongoosejs.com/docs/tutorials/virtuals.html#mongoose-virtuals
+BootcampSchema.virtual('courses', {
+  ref: 'Course',
+  localField: '_id',
+  foreignField: 'bootcamp', // the filed in the model/course.js
+  justOne: false,
+})
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema)

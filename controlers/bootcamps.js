@@ -35,7 +35,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   convertValues(finalQuery)
 
   // Initialize query
-  let query = Bootcamp.find(finalQuery)
+  let query = Bootcamp.find(finalQuery).populate('courses')
 
   // Handle field selection
   if (req.query.select) {
@@ -58,6 +58,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   const endIndex = page * limit
   const total = await Bootcamp.countDocuments()
   query = query.skip(startIndex).limit(limit)
+
   // Execute query
   const results = await query
 
@@ -155,7 +156,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @acsess  Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id
-  const bootcampPromise = await Bootcamp.findByIdAndDelete(id)
+  const bootcampPromise = await Bootcamp.findById(id)
   //   {new:true} : will return the new updated Model
   if (!bootcampPromise) {
     return next(
@@ -165,6 +166,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
       )
     )
   }
+  await bootcampPromise.deleteOne()
 
   res.status(200).json({
     succsess: true,
