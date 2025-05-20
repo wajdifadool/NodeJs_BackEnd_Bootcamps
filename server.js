@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/errorHandler')
 
 // Route file
 const bootcamps = require('./routes/bootcamps')
+const courses = require('./routes/courses')
 
 // Load ENV VARS
 dotenv.config({
@@ -46,6 +47,8 @@ if (process.env.NODE_ENV === 'development') {
 // app.use(middlewareLooger)
 // mount routers
 app.use('/api/v1/bootcamps', bootcamps)
+app.use('/api/v1/courses', courses)
+
 app.use(errorHandler)
 
 // to run the server we have to listen to ( http module )
