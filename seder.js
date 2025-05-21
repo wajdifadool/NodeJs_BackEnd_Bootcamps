@@ -12,9 +12,9 @@ const Course = require('./model/Course')
 
 const connectDB = async () => {
   const conn = await mongoose.connect(process.env.MONGO_URI)
-  console.log(
-    colors.green(`🍃 MongoDB connected:  ${conn.connection.host} 🍃 `.bold)
-  )
+  // console.log(
+  //   colors.green(`🍃 MongoDB connected:  ${conn.connection.host} 🍃 `.bold)
+  // )
 }
 connectDB()
 
@@ -35,7 +35,7 @@ const courses = JSON.parse(
 const impotData = async () => {
   try {
     await Bootcamp.create(bootcamps)
-    await Course.create(courses)
+    // await Course.create(courses)
     console.log('data Imported to the db ...'.green.inverse)
     process.exit()
   } catch (error) {

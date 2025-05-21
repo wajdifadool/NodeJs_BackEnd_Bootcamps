@@ -12,7 +12,7 @@ const {
 // Include other resourse router
 const courseRouter = require('./courses')
 //Re-route into other resourse router
-router.use('/:bootcampId/courses', courseRouter) // used
+router.use('/:bootcampId/courses', courseRouter)
 // mounted to the courseRouter
 // which means will be routed to the Course Router End point ( the courses.js file) //but make sure we include in the routes/course.js the follwing object to the Router {mergeParams:true}
 
