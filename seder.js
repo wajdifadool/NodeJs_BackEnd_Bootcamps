@@ -35,7 +35,7 @@ const courses = JSON.parse(
 const impotData = async () => {
   try {
     await Bootcamp.create(bootcamps)
-    // await Course.create(courses)
+    await Course.create(courses)
     console.log('data Imported to the db ...'.green.inverse)
     process.exit()
   } catch (error) {

@@ -1,6 +1,9 @@
 const express = require('express')
+const path = require('path')
 const dotenv = require('dotenv')
+const fileupload = require('express-fileupload')
 const connectDB = require('./config/db')
+
 // dev deps
 const morgan = require('morgan')
 const colors = require('colors')
@@ -31,6 +34,13 @@ app.use(express.json())
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
+
+// file upload middleware
+app.use(fileupload())
+
+// set static folder
+app.use(express.static(path.join(__dirname, 'public')))
+
 // // all miidleware functions have (req , res , next)
 // const looger = (req, res, next) => {
 //   // it have acces to to req

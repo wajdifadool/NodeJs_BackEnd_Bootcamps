@@ -1,11 +1,14 @@
 const Bootcamp = require('../model/Bootcamp')
 const mongoose = require('mongoose')
-const errorResponse = require('../utils/errorResponse')
+const path = require('path')
+
 const ErrorResponse = require('../utils/errorResponse')
 const asyncHandler = require('../middleware/async')
+
 /// this is middleware functions
 // mongoose.set('debug', true)
 const qs = require('qs')
+const { deleteFile } = require('../helpers/fileHelper')
 
 // @desc    Get all bootcamps
 // @route   GET /api/v1/bootcamps
@@ -156,6 +159,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @acsess  Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id
+
   const bootcampPromise = await Bootcamp.findById(id)
   //   {new:true} : will return the new updated Model
   if (!bootcampPromise) {
@@ -166,10 +170,71 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
       )
     )
   }
+
   await bootcampPromise.deleteOne()
+
+  if (bootcampPromise.photo) {
+    deleteFile(bootcampPromise.photo)
+  }
 
   res.status(200).json({
     succsess: true,
     data: {},
+  })
+})
+
+// @desc    Upload photo for  bootcamp
+// @route   PUT /api/v1/bootcamps/:id/photo
+// @acsess  Private
+exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+  const id = req.params.id
+  const bootcampPromise = await Bootcamp.findById(id)
+  //   {new:true} : will return the new updated Model
+
+  if (!bootcampPromise) {
+    return next(
+      new ErrorResponse(
+        `Bootcamp Not found with the id of ${req.params.id}`,
+        404
+      )
+    )
+  }
+  // check if file is there
+  if (!req.files) {
+    return next(new ErrorResponse(`please upload image file`, 400))
+  }
+
+  const file = req.files.file
+  // validation
+  if (!file.mimetype.startsWith('image')) {
+    return next(new ErrorResponse(`please upload image file`, 400))
+  }
+  if (file.size > process.env.FILE_UPLOAD_MAX) {
+    return next(
+      new ErrorResponse(
+        `please upload image size lte ${process.env.FILE_UPLOAD_MAX}`,
+        400
+      )
+    )
+  }
+
+  // create custom file name
+  const file_name_ext = path.parse(file.name).ext
+  file.name = `photo_${bootcampPromise._id}${file_name_ext}`
+
+  // Upload the file
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.log(err)
+      new ErrorResponse(`Something went worng uploading the file`, 500)
+    }
+    // insert to data base
+    await Bootcamp.findByIdAndUpdate(id, { photo: file.name })
+  })
+
+  res.status(200).json({
+    succsess: true,
+    data: file.name,
+    message: 'uploaded image Successfuly',
   })
 })

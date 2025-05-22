@@ -7,6 +7,7 @@ const errorHandler = (err, req, res, next) => {
   console.log('-------------------------------------')
 
   let error = { ...err }
+  error.message = err.message
   // Mongosee Bad Object ID :
   if (err.name === 'CastError') {
     message = `Resource Not found with the id of ${err.value}`

@@ -59,8 +59,6 @@ const CourseSchema = new mongoose.Schema(
  * @param {ObjectId} bootcampId - The ID of the bootcamp to match courses against
  */
 CourseSchema.statics.getAvergeCost = async function (bootcampId) {
-  console.log('Calculating average cost...')
-
   const obj = await this.aggregate([
     {
       /**
@@ -104,7 +102,7 @@ CourseSchema.statics.getAvergeCost = async function (bootcampId) {
     },
   ])
 
-  console.log(obj) // Logs result like: [{ _id: <bootcampId>, averageCost: 8500 }]
+  // console.log(obj) // Logs result like: [{ _id: <bootcampId>, averageCost: 8500 }]
 
   try {
     // No courses found — reset averageCost
