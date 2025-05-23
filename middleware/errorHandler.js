@@ -8,6 +8,9 @@ const errorHandler = (err, req, res, next) => {
 
   let error = { ...err }
   error.message = err.message
+  // console.log('-------------------------------------')
+  // console.log(error)
+  // console.log('-------------------------------------')
   // Mongosee Bad Object ID :
   if (err.name === 'CastError') {
     message = `Resource Not found with the id of ${err.value}`
@@ -16,7 +19,12 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongosee Duplicate Key :
   if (err.code === 11000) {
-    const message = 'Name Of the bootcamp is already exiset'
+    let message
+    if (error.keyValue.email) {
+      message = 'Email already in use.'
+    } else {
+      message = 'Resource name already in use'
+    }
     error = new ErrorResponse(message, 400)
   }
 
