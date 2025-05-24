@@ -67,11 +67,16 @@ UserSchema.pre('save', async function (next) {
 // });
 
 // // Sign JWT and return
+// read more at:https://www.npmjs.com/package/jsonwebtoken for the libary
 // read more at: https://jwt.io/
+
 UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+  const data = { id: this._id }
+  const secret = process.env.JWT_SECRET
+  const expIn = {
     expiresIn: process.env.JWT_EXPIRE,
-  })
+  }
+  return jwt.sign(data, secret, expIn)
 }
 
 // // Match user entered password to hashed password in database

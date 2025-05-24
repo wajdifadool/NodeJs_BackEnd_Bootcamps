@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
 const fileupload = require('express-fileupload')
 const connectDB = require('./config/db')
 
@@ -29,6 +30,9 @@ const app = express()
 // Body parser in order to read request body from the  req
 // its basicly piesc of middleware
 app.use(express.json())
+
+// Cookcie Parser
+app.use(cookieParser())
 
 // Dev loging middleware
 // runs onky on dev mode

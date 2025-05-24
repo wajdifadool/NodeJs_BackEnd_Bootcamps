@@ -15,16 +15,10 @@ exports.register = asyncHandler(async (req, res, next) => {
     name,
     email,
     password,
+    role,
   })
 
-  //   create token
-  // statics are called on the actual method we getting from the model
-
-  const token = user.getSignedJwtToken()
-
-  res
-    .status(200)
-    .json({ message: 'regesiter user ...', token: token, user: user })
+  sendTokenResponse(user, 200, res) // send a token in the cookie
 })
 // @desc    LOGIN User
 // @route   Post /api/v1/auth/login
@@ -37,6 +31,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('provide email and password ', 400))
   }
 
+  //   https://mongoosejs.com/docs/api/model.html#example
   //create user
   const user = await User.findOne({
     email: email,
@@ -51,12 +46,28 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!isMatchPassword) {
     return next(new ErrorResponse('invalid Credentials ', 401))
   }
-
   //   ok great we have a match
+  sendTokenResponse(user, 200, res)
+})
 
+// get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
   //   create token
   // statics are called on the actual method we getting from the model
   const token = user.getSignedJwtToken()
+  const options = {
+    // 30 days experies
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 864e5),
+    httpOnly: true,
+  }
 
-  res.status(200).json({ message: 'regesiter user ...', token: token })
-})
+  //   send cookie with https just for production mode by seting secure:true
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true
+  }
+  res
+    //
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({ success: true, token: token })
+}
