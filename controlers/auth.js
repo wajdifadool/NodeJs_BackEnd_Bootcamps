@@ -1,11 +1,10 @@
 const mongoose = require('mongoose')
-
 const ErrorResponse = require('../utils/errorResponse')
 const asyncHandler = require('../middleware/async')
 
 const User = require('../model/User')
 
-// @desc    Rgister User
+// @desc    Register user
 // @route   GET /api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
@@ -20,8 +19,8 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res) // send a token in the cookie
 })
-// @desc    LOGIN User
-// @route   Post /api/v1/auth/login
+// @desc    Login sser
+// @route   POST /api/v1/auth/login
 // @access  Public
 exports.login = asyncHandler(async (req, res, next) => {
   // get the data
@@ -48,6 +47,18 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
   //   ok great we have a match
   sendTokenResponse(user, 200, res)
+})
+
+// @desc    Get current logged in user
+// @route   GET /api/v1/auth/me
+// @access  Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+  // we have accses to req.user via the protect middleware
+  const user = await User.findById(req.user.id)
+
+  res.status(200).json({ succsess: true, data: user })
+  //   ok great we have a match
+  // sendTokenResponse(user, 200, res)
 })
 
 // get token from model, create cookie and send response

@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-
 const {
   getBootcamps,
   getBootcamp,
@@ -9,6 +8,8 @@ const {
   deleteBootcamp,
   bootcampPhotoUpload,
 } = require('../controlers/bootcamps')
+
+const { protect } = require('../middleware/auth')
 
 const Bootcamp = require('../model/Bootcamp')
 const advancedResults = require('../middleware/advancedResult') // midlleware
@@ -20,7 +21,7 @@ const courseRouter = require('./courses')
 // which means will be routed to the Course Router End point ( the courses.js file) //but make sure we include in the routes/course.js the follwing object to the Router {mergeParams:true}
 router.use('/:bootcampId/courses', courseRouter)
 
-router.route('/:id/photo').put(bootcampPhotoUpload)
+router.route('/:id/photo').put(protect, bootcampPhotoUpload)
 
 /**
  * Exaplionation : .get(advancedResults(Bootcamp, 'courses'), getBootcamps)
@@ -29,9 +30,14 @@ router.route('/:id/photo').put(bootcampPhotoUpload)
 router
   .route('/')
   .get(advancedResults(Bootcamp, 'courses'), getBootcamps)
-  .post(createBootcamp)
+  .post(protect, createBootcamp)
 
-router.route('/:id').get(getBootcamp).put(updateBootcamp).delete(deleteBootcamp)
+router
+  .route('/:id')
+  .get(getBootcamp)
+
+  .put(protect, updateBootcamp)
+  .delete(protect, deleteBootcamp)
 
 module.exports = router
 
