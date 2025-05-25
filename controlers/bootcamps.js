@@ -121,6 +121,26 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/bootcamps
 // @acsess  Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  console.log('cerateing Bootcamp!! createBootcamp() ')
+  // Add user to req.body
+
+  req.body.user = req.user.id // passed from the protect middleware basicly this is the logged in user
+
+  console.log(req.body.user)
+  console.log(req.user.id)
+  // Puplisher (can add only one bootcamp)
+  // admin can add as many
+  // user none
+  // check for published bootcamp under the looged in user
+  const publishedBootcamp = await Bootcamp.findOne({
+    user: req.user.id,
+  })
+  // if the user is not admin, they can only add one bootcamp
+  if (publishedBootcamp && req.user.role !== 'admin') {
+    message = `the user with the id of ${req.user.id} reached maximum bootcamps allowed `
+    return next(new ErrorResponse(message, 404))
+  }
+
   const bootcampPromise = await Bootcamp.create(req.body)
   res.status(201).json({
     succsess: true,

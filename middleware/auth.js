@@ -37,9 +37,26 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
     // pass the loged in user to the req next midlleware
     req.user = await User.findById(decodedToken.id)
+    console.log(req.user)
     next()
   } catch (error) {
     console.log(error)
     return next(new ErrorResponse('not authorized', 401))
   }
 })
+
+// Grant accsess to specific roles
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `User role ${req.user.role} is not  authorized to acsess this route`,
+          403
+        )
+      )
+    }
+    console.log('Authorized!')
+    next()
+  }
+}

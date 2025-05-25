@@ -9,7 +9,7 @@ const {
   bootcampPhotoUpload,
 } = require('../controlers/bootcamps')
 
-const { protect } = require('../middleware/auth')
+const { protect, authorize } = require('../middleware/auth')
 
 const Bootcamp = require('../model/Bootcamp')
 const advancedResults = require('../middleware/advancedResult') // midlleware
@@ -21,7 +21,9 @@ const courseRouter = require('./courses')
 // which means will be routed to the Course Router End point ( the courses.js file) //but make sure we include in the routes/course.js the follwing object to the Router {mergeParams:true}
 router.use('/:bootcampId/courses', courseRouter)
 
-router.route('/:id/photo').put(protect, bootcampPhotoUpload)
+router
+  .route('/:id/photo')
+  .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload)
 
 /**
  * Exaplionation : .get(advancedResults(Bootcamp, 'courses'), getBootcamps)
@@ -30,14 +32,14 @@ router.route('/:id/photo').put(protect, bootcampPhotoUpload)
 router
   .route('/')
   .get(advancedResults(Bootcamp, 'courses'), getBootcamps)
-  .post(protect, createBootcamp)
+  .post(protect, authorize('publisher', 'admin'), createBootcamp)
 
 router
   .route('/:id')
   .get(getBootcamp)
 
-  .put(protect, updateBootcamp)
-  .delete(protect, deleteBootcamp)
+  .put(protect, authorize('publisher', 'admin'), updateBootcamp)
+  .delete(protect, authorize('publisher', 'admin'), deleteBootcamp)
 
 module.exports = router
 
