@@ -35,10 +35,15 @@ const CourseSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    //   relation Ship to bbotcamp
+    //   relationship to bootcamp
     bootcamp: {
       type: mongoose.Schema.ObjectId,
       ref: 'Bootcamp',
+      required: true,
+    },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
       required: true,
     },
   }

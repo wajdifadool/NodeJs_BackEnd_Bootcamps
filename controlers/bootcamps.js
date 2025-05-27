@@ -154,15 +154,17 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id
 
-  const bootcampPromise = await Bootcamp.findByIdAndUpdate(
-    id,
-    { $set: req.body },
-    {
-      new: true,
-      runValidators: true,
-    }
-  )
-  //   {new:true} : will return the new updated Model
+  let bootcampPromise = await Bootcamp.findById(id)
+  // vlaidate ownership
+  const owner = bootcampPromise.user.toString()
+  if (owner !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Not Authorized to update bootcamp for the current user ${req.user.id}`,
+        401
+      )
+    )
+  }
   if (!bootcampPromise) {
     return next(
       new ErrorResponse(
@@ -171,6 +173,16 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
       )
     )
   }
+  // do the actual update
+  bootcampPromise = await Bootcamp.findByIdAndUpdate(
+    id,
+    { $set: req.body },
+    {
+      //   {new:true} : will return the new updated Model
+      new: true,
+      runValidators: true,
+    }
+  )
 
   res.status(200).json({
     succsess: true,
@@ -191,6 +203,15 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
       new ErrorResponse(
         `Bootcamp Not found with the id of ${req.params.id}`,
         404
+      )
+    )
+  }
+  const owner = bootcampPromise.user.toString()
+  if (owner !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Not Authorized to delete bootcamp for the current user ${req.user.id}`,
+        401
       )
     )
   }
@@ -223,6 +244,16 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
       )
     )
   }
+  const owner = bootcampPromise.user.toString()
+  if (owner !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Not Authorized to update bootcamp for the current user ${req.user.id}`,
+        401
+      )
+    )
+  }
+
   // check if file is there
   if (!req.files) {
     return next(new ErrorResponse(`please upload image file`, 400))
