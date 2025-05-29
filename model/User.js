@@ -1,4 +1,4 @@
-// const crypto = require('crypto')
+const crypto = require('crypto')
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -50,8 +50,9 @@ const UserSchema = new mongoose.Schema({
 
 // // Encrypt password using bcrypt
 UserSchema.pre('save', async function (next) {
+  /* make sure it runs only when save is modifed/provided , in otherwords it runs only when th user login/register/updatepassword*/
   if (!this.isModified('password')) {
-    next()
+    next() // move along to next middleware
   }
 
   const salt = await bcrypt.genSalt(10)
@@ -85,21 +86,21 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 } // returns apromise
 
 // // Generate and hash password token
-// UserSchema.methods.getResetPasswordToken = function () {
-//   // Generate token
-//   const resetToken = crypto.randomBytes(20).toString('hex');
+UserSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex')
 
-//   // Hash token and set to resetPasswordToken field
-//   this.resetPasswordToken = crypto
-//     .createHash('sha256')
-//     .update(resetToken)
-//     .digest('hex');
+  // Hash token and set to resetPasswordToken field in the userSchema model
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
 
-//   // Set expire
-//   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+  // Set expire
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
 
-//   return resetToken;
-// };
+  return resetToken // note not
+}
 
 // // Generate email confirm token
 // UserSchema.methods.generateEmailConfirmToken = function (next) {
