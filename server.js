@@ -8,7 +8,7 @@ const connectDB = require('./config/db')
 const mongoSanitize = require('express-mongo-sanitize')
 const helmet = require('helmet')
 const xssClean = require('xss-clean')
-const expressRateLimit = require('express-rate-limit')
+const rateLimit = require('express-rate-limit')
 const hpp = require('hpp')
 const cors = require('cors')
 
