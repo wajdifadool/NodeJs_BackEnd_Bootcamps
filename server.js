@@ -4,6 +4,13 @@ const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const fileupload = require('express-fileupload')
 const connectDB = require('./config/db')
+// Security
+const mongoSanitize = require('express-mongo-sanitize')
+const helmet = require('helmet')
+const xssClean = require('xss-clean')
+const expressRateLimit = require('express-rate-limit')
+const hpp = require('hpp')
+const cors = require('cors')
 
 // dev deps
 const morgan = require('morgan')
@@ -35,6 +42,33 @@ app.use(express.json())
 
 // Cookcie Parser
 app.use(cookieParser())
+
+// Santize data for secutiry
+app.use(mongoSanitize())
+
+// Set Security headears
+app.use(helmet())
+
+// Prevent XSS
+app.use(xssClean())
+
+// rate limitng requests
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Redis, Memcached, etc. See below.
+})
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter)
+
+// prevent Hpp
+app.use(hpp())
+
+// enable CORS
+app.use(cors())
 
 // Dev loging middleware
 // runs onky on dev mode
