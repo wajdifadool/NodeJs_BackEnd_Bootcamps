@@ -15,6 +15,7 @@ const errorHandler = require('./middleware/errorHandler')
 const bootcamps = require('./routes/bootcamps')
 const courses = require('./routes/courses')
 const auth = require('./routes/auth')
+const users = require('./routes/users')
 
 // Load ENV VARS
 dotenv.config({
@@ -64,7 +65,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/v1/bootcamps', bootcamps)
 app.use('/api/v1/courses', courses)
 app.use('/api/v1/auth/', auth)
-
+app.use('/api/v1/users', users)
 app.use(errorHandler)
 
 // to run the server we have to listen to ( http module )
@@ -80,11 +81,4 @@ const server = app.listen(PORT, () => {
     `listneng to port ${PORT}\nlistneng in mode ${process.env.NODE_ENV}`.bgWhite
       .green
   console.log(text)
-})
-
-// handle unhandled promise rejection connection
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error ${err.message}`.bgRed)
-  // close server and exit the processs
-  server.close(() => process.exit(1))
 })
