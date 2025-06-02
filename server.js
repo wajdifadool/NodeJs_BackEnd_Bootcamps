@@ -5,16 +5,17 @@ const cookieParser = require('cookie-parser')
 const fileupload = require('express-fileupload')
 const connectDB = require('./config/db')
 // Security
-const mongoSanitize = require('express-mongo-sanitize')
+
 const helmet = require('helmet')
-const xssClean = require('xss-clean')
+const xss = require('x-xss-protection')
 const rateLimit = require('express-rate-limit')
 const hpp = require('hpp')
 const cors = require('cors')
+const mongoSanitize = require('mongo-sanitize')
 
 // dev deps
 const morgan = require('morgan')
-const colors = require('colors')
+// const colors = require('colors')
 const middlewareLooger = require('./middleware/logger')
 const errorHandler = require('./middleware/errorHandler')
 
@@ -40,17 +41,22 @@ const app = express()
 // its basicly piesc of middleware
 app.use(express.json())
 
-// Cookcie Parser
+// Cookie Parser
 app.use(cookieParser())
 
-// Santize data for secutiry
-app.use(mongoSanitize())
+// ✅ Global sanitization middleware // Prevent NoSQL injection
+app.use((req, res, next) => {
+  req.body = mongoSanitize(req.body)
+  req.query = mongoSanitize(req.query)
+  req.params = mongoSanitize(req.params)
+  next()
+})
 
 // Set Security headears
 app.use(helmet())
 
 // Prevent XSS
-app.use(xssClean())
+app.use(xss())
 
 // rate limitng requests
 const limiter = rateLimit({
@@ -61,13 +67,13 @@ const limiter = rateLimit({
   // store: ... , // Redis, Memcached, etc. See below.
 })
 
-// Apply the rate limiting middleware to all requests.
+// // Apply the rate limiting middleware to all requests.
 app.use(limiter)
 
-// prevent Hpp
+// // prevent Hpp
 app.use(hpp())
 
-// enable CORS
+// // enable CORS
 app.use(cors())
 
 // Dev loging middleware

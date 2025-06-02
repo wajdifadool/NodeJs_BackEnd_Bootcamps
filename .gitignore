@@ -2,3 +2,4 @@ node_modules/
 config/
 public/
 seed.sh
+data.txt

@@ -6,6 +6,8 @@ const asyncHandler = require('../middleware/async')
 const sendEmail = require('../utils/sendEmail')
 const User = require('../model/User')
 
+const mongoSanitize = require('mongo-sanitize')
+
 // @desc    Register user
 // @route   GET /api/v1/auth/register
 // @access  Public
@@ -25,8 +27,14 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/auth/login
 // @access  Public
 exports.login = asyncHandler(async (req, res, next) => {
-  // get the data
+  // we can santize the data from here but we used midlleware! in server.js
+  // mongoSanitize(req.body.email)
+  // mongoSanitize(req.body.password)
+
   const { email, password } = req.body
+
+  // console.log(req.body)
+  // console.log(sanitizedEmail, sanitizedPassword)
   //   validate email & password
   if (!email || !password) {
     return next(new ErrorResponse('provide email and password ', 400))
