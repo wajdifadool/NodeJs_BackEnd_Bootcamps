@@ -2,9 +2,10 @@ const mongoose = require('mongoose')
 const crypto = require('crypto')
 const ErrorResponse = require('../utils/errorResponse')
 const asyncHandler = require('../middleware/async')
-
 const sendEmail = require('../utils/sendEmail')
 const User = require('../model/User')
+
+const passport = require('passport')
 
 const mongoSanitize = require('mongo-sanitize')
 
@@ -84,63 +85,6 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   //   ok great we have a match
   // sendTokenResponse(user, 200, res)
 })
-
-// @desc    Forget password
-// @route   GET /api/v1/auth/forgetpassword
-// @access  Public
-// exports.forgetpassword = asyncHandler(async (req, res, next) => {
-//   if (!req.body.email) {
-//     return next(new ErrorResponse(` provide an email .`, 400))
-//   }
-//   const user = await User.findOne({
-//     email: req.body.email,
-//   })
-
-//   if (!user) {
-//     return next(
-//       new ErrorResponse(`no user found with email ${req.body.email}.`, 404)
-//     )
-//   }
-//   await user.save({ validateBeforeSave: false })
-//   // get reset Token
-//   const resetToken = user.getResetPasswordToken()
-//   console.log(resetToken)
-
-//   //create rest url
-//   const resetUrl = `${req.protocol}://${req.get(
-//     'host'
-//   )}/api/v1/resetpassword/${resetToken}`
-
-//   const message = `to reset password for the email you provided please make a PUT request to:\n\n ${resetUrl}`
-
-//   try {
-//     await sendEmail({
-//       email: user.email,
-//       subject: 'Password reset token request',
-//       message: message,
-//     })
-
-//     res.status(200).json({
-//       succsess: true,
-//     })
-//   } catch (err) {
-//     console.log(err)
-//     // if something went worng , make sure to clear the tokens and save in the databse
-//     user.resetPasswordToken = undefined
-//     user.resetPasswordExpire = undefined
-
-//     await user.save({ validateBeforSave: false })
-//     return next(new ErrorResponse('Email could not be sent', 500))
-//   }
-
-//   res.status(200).json({
-//     succsess: true,
-//     token: resetToken,
-//     data: user,
-//   })
-//   //   ok great we have a match
-//   // sendTokenResponse(user, 200, res)
-// })
 
 // @desc      Update user details
 // @route     PUT /api/v1/auth/updatedetails
@@ -253,6 +197,55 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res)
 })
+
+// @desc    redirect to google Auth page
+// @route   GET /auth/google/login
+// @access  Public
+exports.googleAuthRedirect = asyncHandler(async (req, res, next) => {
+  res.send(
+    '<a href="http://localhost:5000/api/v1/auth/google">Authintiate with Google</a>'
+  )
+  // res.redirect('/api/v1/auth/google')
+})
+
+exports.googleAuthRequest = passport.authenticate('google', {
+  scope: ['profile', 'email'],
+})
+
+// @desc    Handle authentication callback from google services
+// @route   GET /api/v1/auth/google/callback
+// @access  Public
+exports.googleAuthCallback = (req, res, next) => {
+  passport.authenticate('google', { session: false }, async (err, data) => {
+    if (err || !data || !data.user) {
+      return res.redirect('/auth/failure')
+    }
+
+    const user = data.user
+    const token = user.getSignedJwtToken()
+
+    res.status(200).json({
+      success: true,
+      message: 'Authenticated with Google',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        photo: user.photo,
+        role: user.role,
+      },
+    })
+  })(req, res, next)
+}
+
+// @desc   Logout
+// @route  GET /api/v1/auth/logout
+exports.logout = (req, res) => {
+  req.logout(() => {
+    res.status(200).json({ success: true, message: 'Logged out' })
+  })
+}
 
 // get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {

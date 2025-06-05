@@ -22,7 +22,6 @@ const errorHandler = require('./middleware/errorHandler')
 // Route file
 const bootcamps = require('./routes/bootcamps')
 const courses = require('./routes/courses')
-const auth = require('./routes/auth')
 const users = require('./routes/users')
 const reviews = require('./routes/reviews')
 
@@ -44,7 +43,14 @@ app.use(express.json())
 // Cookie Parser
 app.use(cookieParser())
 
-// ✅ Global sanitization middleware // Prevent NoSQL injection
+const passport = require('passport')
+require('./passport') // must be before passport.use()
+
+app.use(passport.initialize())
+
+const auth = require('./routes/auth')
+
+// Global sanitization middleware // Prevent NoSQL injection
 app.use((req, res, next) => {
   req.body = mongoSanitize(req.body)
   req.query = mongoSanitize(req.query)
@@ -82,6 +88,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
+app.use(morgan('dev'))
 // file upload middleware
 app.use(fileupload())
 

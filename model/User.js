@@ -5,6 +5,15 @@ const jwt = require('jsonwebtoken')
 // const randomize = require('randomatic')
 
 const UserSchema = new mongoose.Schema({
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // allows multiple users without googleId
+  },
+
+  photo: {
+    type: String,
+  },
   name: {
     type: String,
     required: [true, 'Please add a name'],

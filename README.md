@@ -82,6 +82,7 @@ Create the backend for a bootcamp directory website. The frontend/UI will be cre
   - Once registered, a token will be sent along with a cookie (token = xxx)
   - Passwords must be hashed
 - User login
+  - User can authenticate via google using oAuth2.0
   - User can login with email and password
   - Plain text password will compare with stored hashed password
   - Once logged in, a token will be sent along with a cookie (token = xxx)
